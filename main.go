@@ -11,18 +11,22 @@ func main() {
 	lang := ""
 	verbose := false
 	filename := ""
-	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"npm\"")
+	flag.StringVar(&lang, "l", "auto", "Package repository system. Possible values: \"auto\", \"pip\", \"npm\"")
 	flag.BoolVar(&verbose, "v", false, "Verbose output")
 	flag.Parse()
 
-	// Check that we have a filename
-	if flag.NArg() == 0 {
-		Help()
-		flag.Usage()
-		os.Exit(1)
+	if lang == "auto" {
+		lang, filename = guessLang()
+	} else {
+		// Check that we have a filename
+		if flag.NArg() == 0 {
+			Help()
+			flag.Usage()
+			os.Exit(1)
+		}
+		filename = flag.Args()[0]
 	}
 
-	filename = flag.Args()[0]
 	if lang == "pip" {
 		resolver = NewPythonLookup(verbose)
 	} else if lang == "npm" {
@@ -37,6 +41,22 @@ func main() {
 		os.Exit(1)
 	}
 	PrintResult(resolver.PackagesNotInPublic())
+}
+
+func guessLang() (string, string) {
+	langFiles := map[string]string{
+		"npm": "packages.json",
+		"pip": "requirements.txt",
+	}
+
+	for lang, file := range langFiles {
+		if _, err := os.Stat(file); err == nil {
+			return lang, file
+		}
+	}
+
+	fmt.Println("Couldn't guess the language from the existing mapping.")
+	os.Exit(0)
 }
 
 func Help() {
