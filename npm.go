@@ -5,10 +5,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 type PackageJSON struct {
 	Dependencies map[string]string `json:"dependencies"`
+	DevDependencies map[string]string `json:"devDependencies"`
+	PeerDependencies map[string]string `json:"peerDependencies"`
+	BundledDependencies []string `json:"bundledDependencies"`
+	BundleDependencies []string `json:"bundleDependencies"`
+	OptionalDependencies map[string]string `json:"optionalDependencies"`
 }
 
 type NPMLookup struct{
@@ -33,29 +39,57 @@ func (n *NPMLookup) ReadPackagesFromFile(filename string) error {
 	for pkgname, _ := range data.Dependencies {
 		n.Packages = append(n.Packages, pkgname)
 	}
+	for pkgname, _ := range data.DevDependencies {
+		n.Packages = append(n.Packages, pkgname)
+	}
+	for pkgname, _ := range data.PeerDependencies {
+		n.Packages = append(n.Packages, pkgname)
+	}
+	for pkgname, _ := range data.OptionalDependencies {
+		n.Packages = append(n.Packages, pkgname)
+	}
+	for _, pkgname := range data.BundledDependencies {
+		n.Packages = append(n.Packages, pkgname)
+	}
+	for _, pkgname := range data.BundleDependencies {
+		n.Packages = append(n.Packages, pkgname)
+	}
 	return nil
 }
 
 func (n *NPMLookup) PackagesNotInPublic() []string {
 	notavail := []string{}
 	for _, pkg := range n.Packages {
-		if !n.isAvailableInPublic(pkg) {
+		if !n.isAvailableInPublic(pkg, 0) {
 			notavail = append(notavail, pkg)
 		}
 	}
 	return notavail
 }
 
-func (n *NPMLookup) isAvailableInPublic(pkgname string) bool {
-	if n.Verbose {
-		fmt.Print("Checking: https://www.npmjs.com/package/" + pkgname + " : ")
+func (n *NPMLookup) isAvailableInPublic(pkgname string, retry int) bool {
+	if retry > 3 {
+		fmt.Printf(" [W] Maximum number of retries exhausted for package: %s\n", pkgname)
+		return false
 	}
-	resp, _ := http.Get("https://www.npmjs.com/package/" + pkgname)
+	if n.Verbose {
+		fmt.Print("Checking: https://registry.npmjs.org/" + pkgname + "/ : ")
+	}
+	resp, err := http.Get("https://registry.npmjs.org/" + pkgname + "/")
+	if err != nil {
+		fmt.Printf(" [W] Error when trying to request https://registry.npmjs.org/" + pkgname + "/ : %s\n", err)
+		return false
+	}
 	if n.Verbose {
 		fmt.Printf("%s\n", resp.Status)
 	}
 	if resp.StatusCode == http.StatusOK {
 		return true
+	} else if resp.StatusCode == 429 {
+		fmt.Printf(" [!] Server responded with 429 (Too many requests), throttling and retrying...\n")
+		time.Sleep(10 * time.Second)
+		retry = retry + 1
+		n.isAvailableInPublic(pkgname, retry)
 	}
 	return false
 }

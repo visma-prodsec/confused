@@ -62,7 +62,11 @@ func (p *PythonLookup) isAvailableInPublic(pkgname string) bool {
 	if p.Verbose {
 		fmt.Print("Checking: https://pypi.org/project/" + pkgname + "/ : ")
 	}
-	resp, _ := http.Get("https://pypi.org/project/" + pkgname + "/")
+	resp, err := http.Get("https://pypi.org/project/" + pkgname + "/")
+	if err != nil {
+		fmt.Printf(" [W] Error when trying to request https://pypi.org/project/" + pkgname + "/ : %s\n", err)
+		return false
+	}
 	if p.Verbose {
 		fmt.Printf("%s\n", resp.Status)
 	}
