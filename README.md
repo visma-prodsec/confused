@@ -21,7 +21,7 @@ Usage:
 
 Usage of ./confused:
   -l string
-        Package repository system. Possible values: "pip", "npm", "ruby" (default "pip")
+        Package repository system. Possible values: "pip", "npm" (default "pip")
   -v    Verbose output
 
 ```
