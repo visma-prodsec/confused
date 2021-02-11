@@ -9,17 +9,17 @@ import (
 )
 
 type PackageJSON struct {
-	Dependencies map[string]string `json:"dependencies"`
-	DevDependencies map[string]string `json:"devDependencies"`
-	PeerDependencies map[string]string `json:"peerDependencies"`
-	BundledDependencies []string `json:"bundledDependencies"`
-	BundleDependencies []string `json:"bundleDependencies"`
-	OptionalDependencies map[string]string `json:"optionalDependencies"`
+	Dependencies         map[string]string `json:"dependencies,omitempty"`
+	DevDependencies      map[string]string `json:"devDependencies,omitempty"`
+	PeerDependencies     map[string]string `json:"peerDependencies,omitempty"`
+	BundledDependencies  []string          `json:"bundledDependencies,omitempty"`
+	BundleDependencies   []string          `json:"bundleDependencies,omitempty"`
+	OptionalDependencies map[string]string `json:"optionalDependencies,omitempty"`
 }
 
-type NPMLookup struct{
+type NPMLookup struct {
 	Packages []string
-	Verbose bool
+	Verbose  bool
 }
 
 func NewNPMLookup(verbose bool) PackageResolver {
@@ -77,7 +77,7 @@ func (n *NPMLookup) isAvailableInPublic(pkgname string, retry int) bool {
 	}
 	resp, err := http.Get("https://registry.npmjs.org/" + pkgname + "/")
 	if err != nil {
-		fmt.Printf(" [W] Error when trying to request https://registry.npmjs.org/" + pkgname + "/ : %s\n", err)
+		fmt.Printf(" [W] Error when trying to request https://registry.npmjs.org/"+pkgname+"/ : %s\n", err)
 		return false
 	}
 	if n.Verbose {
