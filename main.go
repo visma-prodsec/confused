@@ -11,7 +11,7 @@ func main() {
 	lang := ""
 	verbose := false
 	filename := ""
-	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"npm\"")
+	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"npm\", \"composer\"")
 	flag.BoolVar(&verbose, "v", false, "Verbose output")
 	flag.Parse()
 
@@ -27,6 +27,8 @@ func main() {
 		resolver = NewPythonLookup(verbose)
 	} else if lang == "npm" {
 		resolver = NewNPMLookup(verbose)
+	} else if lang == "composer" {
+		resolver = NewComposerLookup(verbose)
 	} else {
 		fmt.Printf("Unknown package repository system: %s\n", lang)
 		os.Exit(1)
