@@ -42,16 +42,16 @@ func (n *NPMLookup) ReadPackagesFromFile(filename string) error {
 	if err != nil {
 		return err
 	}
-	for pkgname, _ := range data.Dependencies {
+	for pkgname := range data.Dependencies {
 		n.Packages = append(n.Packages, pkgname)
 	}
-	for pkgname, _ := range data.DevDependencies {
+	for pkgname := range data.DevDependencies {
 		n.Packages = append(n.Packages, pkgname)
 	}
-	for pkgname, _ := range data.PeerDependencies {
+	for pkgname := range data.PeerDependencies {
 		n.Packages = append(n.Packages, pkgname)
 	}
-	for pkgname, _ := range data.OptionalDependencies {
+	for pkgname := range data.OptionalDependencies {
 		n.Packages = append(n.Packages, pkgname)
 	}
 	for _, pkgname := range data.BundledDependencies {
