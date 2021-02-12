@@ -47,7 +47,9 @@ func Help() {
 
 func PrintResult(notavail []string) {
 	if len(notavail) == 0 {
-		fmt.Printf(" [*] All packages seem to be available in the public repositories. Dependency confusion should not be possible.\n")
+		fmt.Printf("[*] All packages seem to be available in the public repositories. \n\n" +
+			"In case your application uses private repositories please make sure that those namespaces in \n" +
+			"public repositories are controlled by a trusted party.\n\n")
 		return
 	}
 	fmt.Printf("Issues found, the following packages are not available in public package repositories:\n")
