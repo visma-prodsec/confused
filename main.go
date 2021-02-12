@@ -42,9 +42,7 @@ func main() {
 }
 
 func Help() {
-	fmt.Println(fmt.Sprintf(`Usage:
- %s [-l LANGUAGENAME] depfilename.ext
-`, os.Args[0]))
+	fmt.Printf("Usage:\n %s [-l LANGUAGENAME] depfilename.ext\n", os.Args[0])
 }
 
 func PrintResult(notavail []string) {

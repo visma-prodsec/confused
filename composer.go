@@ -34,11 +34,11 @@ func (c *ComposerLookup) ReadPackagesFromFile(filename string) error {
 		return err
 	}
 
-	for pkgname, _ := range data.Require {
+	for pkgname := range data.Require {
 		c.Packages = append(c.Packages, pkgname)
 	}
 
-	for pkgname, _ := range data.RequireDev {
+	for pkgname := range data.RequireDev {
 		c.Packages = append(c.Packages, pkgname)
 	}
 
@@ -78,12 +78,12 @@ func (c *ComposerLookup) isAvailableInPublic(pkgname string, retry int) bool {
 	}
 
 	resp, err := client.Get("https://packagist.org/packages/" + pkgname)
-	defer resp.Body.Close()
 	if err != nil {
 		fmt.Printf(" [W] Error when trying to request https://packagist.org/packages/%s : %s\n", pkgname, err)
 
 		return false
 	}
+	defer resp.Body.Close()
 
 	if c.Verbose {
 		fmt.Printf("%s\n", resp.Status)
