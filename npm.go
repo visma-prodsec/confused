@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// PackageJSON represents the dependencies of an npm package
 type PackageJSON struct {
 	Dependencies         map[string]string `json:"dependencies,omitempty"`
 	DevDependencies      map[string]string `json:"devDependencies,omitempty"`
@@ -17,15 +18,20 @@ type PackageJSON struct {
 	OptionalDependencies map[string]string `json:"optionalDependencies,omitempty"`
 }
 
+// NPMLookup represents a collection of npm packages to be tested for dependency confusion.
 type NPMLookup struct {
 	Packages []string
 	Verbose  bool
 }
 
+// NewNPMLookup constructs an `NPMLookup` struct and returns it.
 func NewNPMLookup(verbose bool) PackageResolver {
 	return &NPMLookup{Packages: []string{}, Verbose: verbose}
 }
 
+// ReadPackagesFromFile reads package information from an npm package.json file
+//
+// Returns any errors encountered
 func (n *NPMLookup) ReadPackagesFromFile(filename string) error {
 	rawfile, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -57,6 +63,9 @@ func (n *NPMLookup) ReadPackagesFromFile(filename string) error {
 	return nil
 }
 
+// PackagesNotInPublic determines if an npm package does not exist in the public npm package repository.
+//
+// Returns a slice of strings with any npm packages not in the public npm package repository
 func (n *NPMLookup) PackagesNotInPublic() []string {
 	notavail := []string{}
 	for _, pkg := range n.Packages {
@@ -67,6 +76,9 @@ func (n *NPMLookup) PackagesNotInPublic() []string {
 	return notavail
 }
 
+// isAvailableInPublic determines if an npm package exists in the public npm package repository.
+//
+// Returns true if the package exists in the public npm package repository.
 func (n *NPMLookup) isAvailableInPublic(pkgname string, retry int) bool {
 	if retry > 3 {
 		fmt.Printf(" [W] Maximum number of retries exhausted for package: %s\n", pkgname)
