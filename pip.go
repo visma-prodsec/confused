@@ -21,16 +21,25 @@ func (p *PythonLookup) ReadPackagesFromFile(filename string) error {
 	if err != nil {
 		return err
 	}
+	line := ""
 	for _, l := range strings.Split(string(rawfile), "\n") {
 		l = strings.TrimSpace(l)
 		if strings.HasPrefix(l, "#") {
 			continue
 		}
 		if len(l) > 0 {
-			pkgrow := strings.FieldsFunc(l, p.pipSplit)
+			// Support line continuation
+			if strings.HasSuffix(l, "\\") {
+				line += l[:len(l) - 1]
+				continue
+			}
+			line += l
+			pkgrow := strings.FieldsFunc(line, p.pipSplit)
 			if len(pkgrow) > 0 {
 				p.Packages = append(p.Packages, strings.TrimSpace(pkgrow[0]))
 			}
+			// reset the line variable
+			line = ""
 		}
 	}
 	return nil
@@ -54,6 +63,7 @@ func (p *PythonLookup) pipSplit(r rune) bool {
 		'!',
 		' ',
 		'#',
+		'[',
 	}
 	return inSlice(r, delims)
 }
