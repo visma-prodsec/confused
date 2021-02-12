@@ -1,10 +1,10 @@
 # Confused
 
-A tool for checking for lingering free namespaces for private package names referenced in dependency configuration 
-for Python (pypi) `requirements.txt` or JavaScript (npm) `package.json`
+A tool for checking for lingering free namespaces for private package names referenced in dependency configuration
+for Python (pypi) `requirements.txt`, JavaScript (npm) `package.json` or PHP (composer) `composer.json`.
 
 
-## Installation 
+## Installation
 
 - [Download](https://github.com/visma-prodsec/confused/releases/latest) a prebuilt binary from [releases page](https://github.com/visma-prodsec/confused/releases/latest), unpack and run!
 
@@ -21,7 +21,7 @@ Usage:
 
 Usage of ./confused:
   -l string
-        Package repository system. Possible values: "pip", "npm" (default "pip")
+        Package repository system. Possible values: "pip", "npm", "composer" (default "pip")
   -v    Verbose output
 
 ```
