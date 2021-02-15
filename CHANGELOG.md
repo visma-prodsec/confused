@@ -2,6 +2,10 @@
 
 - main
     - New
+    - Changed
+
+- v0.3
+    - New
         - PHP (composer) support
         - Command line parameter to let the user to flag namespaces as known-safe
     - Changed
