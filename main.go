@@ -1,3 +1,10 @@
+/*
+Package main implements an automated Dependency Confusion scanner.
+
+Original research provided by Alex Birsan.
+
+Original blog post detailing Dependency Confusion : https://medium.com/@alex.birsan/dependency-confusion-4a5d60fec610 .
+*/
 package main
 
 import (
@@ -41,10 +48,12 @@ func main() {
 	PrintResult(resolver.PackagesNotInPublic())
 }
 
+// Help outputs tool usage and help
 func Help() {
 	fmt.Printf("Usage:\n %s [-l LANGUAGENAME] depfilename.ext\n", os.Args[0])
 }
 
+// PrintResult outputs the result of the scanner
 func PrintResult(notavail []string) {
 	if len(notavail) == 0 {
 		fmt.Printf("[*] All packages seem to be available in the public repositories. \n\n" +
