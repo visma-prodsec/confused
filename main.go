@@ -76,7 +76,7 @@ func PrintResult(notavail []string) {
 func removeSafe(packages []string, safespaces string) []string {
 	retSlice := []string{}
 	safeNamespaces := []string{}
-	var ignored bool = false
+	var ignored bool
 	safeTmp := strings.Split(safespaces, ",")
 	for _, s := range safeTmp {
 		safeNamespaces = append(safeNamespaces, strings.TrimSpace(s))
