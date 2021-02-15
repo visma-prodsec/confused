@@ -40,7 +40,7 @@ func (n *NPMLookup) ReadPackagesFromFile(filename string) error {
 	data := PackageJSON{}
 	err = json.Unmarshal([]byte(rawfile), &data)
 	if err != nil {
-		return err
+		fmt.Printf(" [W] Non-fatal issue encountered while reading %s : %s\n", filename, err)
 	}
 	for pkgname := range data.Dependencies {
 		n.Packages = append(n.Packages, pkgname)
