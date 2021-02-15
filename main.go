@@ -70,6 +70,7 @@ func PrintResult(notavail []string) {
 	for _, n := range notavail {
 		fmt.Printf(" [!] %s\n", n)
 	}
+	os.Exit(1)
 }
 
 // removeSafe removes known-safe package names from the slice
@@ -99,4 +100,3 @@ func removeSafe(packages []string, safespaces string) []string {
 	}
 	return retSlice
 }
-
