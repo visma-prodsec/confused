@@ -11,6 +11,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 func main() {
@@ -18,7 +20,9 @@ func main() {
 	lang := ""
 	verbose := false
 	filename := ""
+	safespaces := ""
 	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"npm\", \"composer\"")
+	flag.StringVar(&safespaces, "s", "", "Comma-separated list of known-secure namespaces. Supports wildcards")
 	flag.BoolVar(&verbose, "v", false, "Verbose output")
 	flag.Parse()
 
@@ -45,7 +49,8 @@ func main() {
 		fmt.Printf("Encountered an error while trying to read packages from file: %s\n", err)
 		os.Exit(1)
 	}
-	PrintResult(resolver.PackagesNotInPublic())
+	outputPackages := removeSafe(resolver.PackagesNotInPublic(), safespaces)
+	PrintResult(outputPackages)
 }
 
 // Help outputs tool usage and help
@@ -66,3 +71,32 @@ func PrintResult(notavail []string) {
 		fmt.Printf(" [!] %s\n", n)
 	}
 }
+
+// removeSafe removes known-safe package names from the slice
+func removeSafe(packages []string, safespaces string) []string {
+	retSlice := []string{}
+	safeNamespaces := []string{}
+	var ignored bool = false
+	safeTmp := strings.Split(safespaces, ",")
+	for _, s := range safeTmp {
+		safeNamespaces = append(safeNamespaces, strings.TrimSpace(s))
+	}
+	for _, p := range packages {
+		ignored = false
+		for _, s := range safeNamespaces {
+			ok, err := filepath.Match(s, p)
+			if err != nil {
+				fmt.Printf(" [W] Encountered an error while trying to match a known-safe namespace %s : %s\n", s, err)
+				continue
+			}
+			if ok {
+				ignored = true
+			}
+		}
+		if !ignored {
+			retSlice = append(retSlice, p)
+		}
+	}
+	return retSlice
+}
+
