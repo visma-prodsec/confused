@@ -47,13 +47,34 @@ Usage:
 Usage of ./confused:
   -l string
         Package repository system. Possible values: "pip", "npm", "composer" (default "npm")
+  -s string
+        Comma-separated list of known-secure namespaces. Supports wildcards
   -v    Verbose output
 
 ```
 
 ## Example
+
+### Python (PyPI)
 ```
 ./confused -l pip requirements.txt
+
+Issues found, the following packages are not available in public package repositories:
+ [!] internal_package1
+
+```
+
+### JavaScript (npm)
+```
+./confused -l npm package.json
+
+Issues found, the following packages are not available in public package repositories:
+ [!] internal_package1
+ [!] @mycompany/internal_package1
+ [!] @mycompany/internal_package2
+
+# Example when @mycompany private scope has been registered in npm, using -s
+./confused -l npm -s '@mycompany/*' package.json
 
 Issues found, the following packages are not available in public package repositories:
  [!] internal_package1
