@@ -2,6 +2,7 @@
 
 - main
     - New
+        - npm: In case package was found, also check if all the package versions have been unpublished. This makes the package vulnerable to takeover
     - Changed
 
 - v0.3
