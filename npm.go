@@ -42,10 +42,7 @@ type NpmResponseUnpublished struct {
 // NotAvailable returns true if the package has its all versions unpublished making it susceptible for takeover
 func (n *NpmResponse) NotAvailable() bool {
 	// Check if a known field has a value
-	if len(n.Time.Unpublished.Name) > 0 {
-		return true
-	}
-	return false
+	return len(n.Time.Unpublished.Name) > 0
 }
 
 // NPMLookup represents a collection of npm packages to be tested for dependency confusion.
@@ -125,7 +122,7 @@ func (n *NPMLookup) isAvailableInPublic(pkgname string, retry int) bool {
 	if resp.StatusCode == http.StatusOK {
 		npmResp := NpmResponse{}
 		body, _ := ioutil.ReadAll(resp.Body)
-		json.Unmarshal(body, &npmResp)
+		_ = json.Unmarshal(body, &npmResp)
 		if npmResp.NotAvailable() {
 			if n.Verbose {
 				fmt.Printf("[W] Package %s was found, but all its versions are unpublished, making anyone able to takeover the namespace.\n", pkgname)
