@@ -70,6 +70,7 @@ func (p *PythonLookup) pipSplit(r rune) bool {
 		'>',
 		'!',
 		' ',
+		'~',
 		'#',
 		'[',
 	}
