@@ -5,6 +5,7 @@
         - npm: In case package was found, also check if all the package versions have been unpublished. This makes the package vulnerable to takeover
         - npm: Check for http & https and GitHub version references
     - Changed
+        - Fixed a bug where the pip requirements.txt parser processes a 'tilde equals' sign.
 
 - v0.3
     - New
