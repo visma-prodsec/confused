@@ -102,7 +102,7 @@ func (n *NPMLookup) ReadPackagesFromFile(filename string) error {
 func (n *NPMLookup) PackagesNotInPublic() []string {
 	notavail := []string{}
 	for _, pkg := range n.Packages {
-		if n.localReference(pkg.Version) || n.urlReference(pkg.Version) {
+		if n.localReference(pkg.Version) || n.urlReference(pkg.Version) || n.gitReference(pkg.Version) {
 			continue
 		}
 		if n.gitHubReference(pkg.Version) {
@@ -169,6 +169,18 @@ func (n *NPMLookup) localReference(pkgversion string) bool {
 func (n *NPMLookup) urlReference(pkgversion string) bool {
 	pkgversion = strings.ToLower(pkgversion)
 	return strings.HasPrefix(pkgversion, "http:") || strings.HasPrefix(pkgversion, "https:")
+}
+
+// gitReference checks if the package version is in fact a reference to a remote git repository
+func (n *NPMLookup) gitReference(pkgversion string) bool {
+	pkgversion = strings.ToLower(pkgversion)
+	gitResources := []string{"git+ssh:", "git+http:", "git+https:", "git:"}
+	for _, r := range gitResources {
+		if strings.HasPrefix(pkgversion, r) {
+			return true
+		}
+	}
+	return false
 }
 
 // gitHubReference checks if the package version refers to a GitHub repository

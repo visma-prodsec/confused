@@ -4,12 +4,10 @@
     - New
         - npm: In case package was found, also check if all the package versions have been unpublished. This makes the package vulnerable to takeover
         - npm: Check for http & https and GitHub version references
+        - MVN (Maven) support
     - Changed
         - Fixed a bug where the pip requirements.txt parser processes a 'tilde equals' sign.
-
-- v0.4
-    - New
-        - MVN (Maven) support
+        - Fixed an issue that would detect git repository urls as matches
 
 - v0.3
     - New
