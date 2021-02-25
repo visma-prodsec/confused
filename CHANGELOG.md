@@ -7,6 +7,10 @@
     - Changed
         - Fixed a bug where the pip requirements.txt parser processes a 'tilde equals' sign.
 
+- v0.4
+    - New
+        - MVN (Maven) support
+
 - v0.3
     - New
         - PHP (composer) support

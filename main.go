@@ -21,7 +21,7 @@ func main() {
 	verbose := false
 	filename := ""
 	safespaces := ""
-	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"npm\", \"composer\"")
+	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"npm\", \"composer\", \"mvn\"")
 	flag.StringVar(&safespaces, "s", "", "Comma-separated list of known-secure namespaces. Supports wildcards")
 	flag.BoolVar(&verbose, "v", false, "Verbose output")
 	flag.Parse()
@@ -40,6 +40,8 @@ func main() {
 		resolver = NewNPMLookup(verbose)
 	} else if lang == "composer" {
 		resolver = NewComposerLookup(verbose)
+	} else if lang == "mvn" {
+		resolver = NewMVNLookup(verbose)
 	} else {
 		fmt.Printf("Unknown package repository system: %s\n", lang)
 		os.Exit(1)
