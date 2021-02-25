@@ -11,33 +11,6 @@ import (
 	"time"
 )
 
-type MvnResponse struct {
-	ID   string `json:"_id"`
-	Name string `json:"name"`
-	Time struct {
-		Unpublished NpmResponseUnpublished `json:"unpublished"`
-	} `json:"time"`
-}
-
-type MvnResponseUnpublished struct {
-	Maintainers []struct {
-		Email string `json:"email"`
-		Name  string `json:"name"`
-	} `json:"maintainers"`
-	Name string `json:"name"`
-	Tags struct {
-		Latest string `json:"latest"`
-	} `json:"tags"`
-	Time     time.Time `json:"time"`
-	Versions []string  `json:"versions"`
-}
-
-// NotAvailable returns true if the package has its all versions unpublished making it susceptible for takeover
-func (n *MvnResponse) NotAvailable() bool {
-	// Check if a known field has a value
-	return len(n.Time.Unpublished.Name) > 0
-}
-
 // NPMLookup represents a collection of npm packages to be tested for dependency confusion.
 type MVNLookup struct {
 	Packages []MVNPackage
