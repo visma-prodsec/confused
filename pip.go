@@ -35,7 +35,7 @@ func (p *PythonLookup) ReadPackagesFromFile(filename string) error {
 		if len(l) > 0 {
 			// Support line continuation
 			if strings.HasSuffix(l, "\\") {
-				line += l[:len(l) - 1]
+				line += l[:len(l)-1]
 				continue
 			}
 			line += l
@@ -73,6 +73,7 @@ func (p *PythonLookup) pipSplit(r rune) bool {
 		'~',
 		'#',
 		'[',
+		';',
 	}
 	return inSlice(r, delims)
 }
