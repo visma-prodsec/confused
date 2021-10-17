@@ -8,6 +8,7 @@ Original blog post detailing Dependency Confusion : https://medium.com/@alex.bir
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -21,8 +22,10 @@ func main() {
 	verbose := false
 	filename := ""
 	safespaces := ""
+	outputFormat := ""
 	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"npm\", \"composer\", \"mvn\"")
 	flag.StringVar(&safespaces, "s", "", "Comma-separated list of known-secure namespaces. Supports wildcards")
+	flag.StringVar(&outputFormat, "o", "plain", "Output format. Possible values: \"json\", \"plain\"")
 	flag.BoolVar(&verbose, "v", false, "Verbose output")
 	flag.Parse()
 
@@ -52,7 +55,7 @@ func main() {
 		os.Exit(1)
 	}
 	outputPackages := removeSafe(resolver.PackagesNotInPublic(), safespaces)
-	PrintResult(outputPackages)
+	PrintResult(outputPackages, outputFormat)
 }
 
 // Help outputs tool usage and help
@@ -61,18 +64,30 @@ func Help() {
 }
 
 // PrintResult outputs the result of the scanner
-func PrintResult(notavail []string) {
-	if len(notavail) == 0 {
-		fmt.Printf("[*] All packages seem to be available in the public repositories. \n\n" +
-			"In case your application uses private repositories please make sure that those namespaces in \n" +
-			"public repositories are controlled by a trusted party.\n\n")
-		return
+func PrintResult(notavail []string, outputFormat string) {
+	if outputFormat == "json" {
+		resultBytes, err := json.Marshal(notavail)
+		if err != nil {
+			fmt.Printf("error while converting the result to json format: %s\n", err.Error())
+			os.Exit(1)
+		}
+		fmt.Println(string(resultBytes))
+		if len(notavail) > 0 {
+			os.Exit(1)
+		}
+	} else if outputFormat == "plain" {
+		if len(notavail) == 0 {
+			fmt.Printf("[*] All packages seem to be available in the public repositories. \n\n" +
+				"In case your application uses private repositories please make sure that those namespaces in \n" +
+				"public repositories are controlled by a trusted party.\n\n")
+			return
+		}
+		fmt.Printf("Issues found, the following packages are not available in public package repositories:\n")
+		for _, n := range notavail {
+			fmt.Printf(" [!] %s\n", n)
+		}
+		os.Exit(1)
 	}
-	fmt.Printf("Issues found, the following packages are not available in public package repositories:\n")
-	for _, n := range notavail {
-		fmt.Printf(" [!] %s\n", n)
-	}
-	os.Exit(1)
 }
 
 // removeSafe removes known-safe package names from the slice
