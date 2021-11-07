@@ -49,6 +49,8 @@ Usage of ./confused:
         Package repository system. Possible values: "pip", "npm", "composer", "mvn" (default "npm")
   -s string
         Comma-separated list of known-secure namespaces. Supports wildcards
+  -o string
+        Output format. Possible values: "json", "plain" (default "plain")
   -v    Verbose output
 
 ```
@@ -61,6 +63,13 @@ Usage of ./confused:
 
 Issues found, the following packages are not available in public package repositories:
  [!] internal_package1
+```
+
+#### JSON Output
+```
+./confused -l pip -o json requirements.txt
+
+["internal_package1"]
 
 ```
 

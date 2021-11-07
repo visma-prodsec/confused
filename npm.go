@@ -73,7 +73,9 @@ func (n *NPMLookup) ReadPackagesFromFile(filename string) error {
 	data := PackageJSON{}
 	err = json.Unmarshal([]byte(rawfile), &data)
 	if err != nil {
-		fmt.Printf(" [W] Non-fatal issue encountered while reading %s : %s\n", filename, err)
+		if n.Verbose {
+			fmt.Printf(" [W] Non-fatal issue encountered while reading %s : %s\n", filename, err)
+		}
 	}
 	for pkgname, pkgversion := range data.Dependencies {
 		n.Packages = append(n.Packages, NPMPackage{pkgname, pkgversion})
@@ -125,7 +127,9 @@ func (n *NPMLookup) PackagesNotInPublic() []string {
 // Returns true if the package exists in the public npm package repository.
 func (n *NPMLookup) isAvailableInPublic(pkgname string, retry int) bool {
 	if retry > 3 {
-		fmt.Printf(" [W] Maximum number of retries exhausted for package: %s\n", pkgname)
+		if n.Verbose {
+			fmt.Printf(" [W] Maximum number of retries exhausted for package: %s\n", pkgname)
+		}
 		return false
 	}
 	if n.Verbose {
@@ -133,7 +137,9 @@ func (n *NPMLookup) isAvailableInPublic(pkgname string, retry int) bool {
 	}
 	resp, err := http.Get("https://registry.npmjs.org/" + pkgname + "/")
 	if err != nil {
-		fmt.Printf(" [W] Error when trying to request https://registry.npmjs.org/"+pkgname+"/ : %s\n", err)
+		if n.Verbose {
+			fmt.Printf(" [W] Error when trying to request https://registry.npmjs.org/"+pkgname+"/ : %s\n", err)
+		}
 		return false
 	}
 	defer resp.Body.Close()
@@ -152,7 +158,9 @@ func (n *NPMLookup) isAvailableInPublic(pkgname string, retry int) bool {
 		}
 		return true
 	} else if resp.StatusCode == 429 {
-		fmt.Printf(" [!] Server responded with 429 (Too many requests), throttling and retrying...\n")
+		if n.Verbose {
+			fmt.Printf(" [!] Server responded with 429 (Too many requests), throttling and retrying...\n")
+		}
 		time.Sleep(10 * time.Second)
 		retry = retry + 1
 		n.isAvailableInPublic(pkgname, retry)
@@ -197,7 +205,9 @@ func (n NPMLookup) gitHubOrgExists(pkgversion string) bool {
 		}
 		resp, err := http.Get("https://github.com/" + orgName)
 		if err != nil {
-			fmt.Printf(" [W] Error while trying to request https://github.com/"+orgName+" : %s\n", err)
+			if n.Verbose {
+				fmt.Printf(" [W] Error while trying to request https://github.com/"+orgName+" : %s\n", err)
+			}
 			return false
 		}
 		defer resp.Body.Close()
