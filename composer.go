@@ -62,7 +62,9 @@ func (c *ComposerLookup) PackagesNotInPublic() []string {
 
 func (c *ComposerLookup) isAvailableInPublic(pkgname string, retry int) bool {
 	if retry > 3 {
-		fmt.Printf(" [W] Maximum number of retries exhausted for package %s\n", pkgname)
+		if c.Verbose {
+			fmt.Printf(" [W] Maximum number of retries exhausted for package %s\n", pkgname)
+		}
 
 		return false
 	}
@@ -79,7 +81,9 @@ func (c *ComposerLookup) isAvailableInPublic(pkgname string, retry int) bool {
 
 	resp, err := client.Get("https://packagist.org/packages/" + pkgname)
 	if err != nil {
-		fmt.Printf(" [W] Error when trying to request https://packagist.org/packages/%s : %s\n", pkgname, err)
+		if c.Verbose {
+			fmt.Printf(" [W] Error when trying to request https://packagist.org/packages/%s : %s\n", pkgname, err)
+		}
 
 		return false
 	}
@@ -94,7 +98,9 @@ func (c *ComposerLookup) isAvailableInPublic(pkgname string, retry int) bool {
 	}
 
 	if resp.StatusCode == 429 {
-		fmt.Printf(" [!] Server responded with 429 (Too many requests), throttling and retrying..\n")
+		if c.Verbose {
+			fmt.Printf(" [!] Server responded with 429 (Too many requests), throttling and retrying..\n")
+		}
 		time.Sleep(10 * time.Second)
 		retry = retry + 1
 

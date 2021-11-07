@@ -5,8 +5,8 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -37,11 +37,16 @@ func (n *MVNLookup) ReadPackagesFromFile(filename string) error {
 		return err
 	}
 
-	fmt.Print("Checking: filename: " + filename + "\n")
+	if n.Verbose {
+		fmt.Print("Checking: filename: " + filename + "\n")
+	}
 
 	var project MavenProject
 	if err := xml.Unmarshal([]byte(rawfile), &project); err != nil {
-		log.Fatalf("unable to unmarshal pom file. Reason: %s\n", err)
+		if n.Verbose {
+			fmt.Printf("unable to unmarshal pom file. Reason: %s\n", err)
+		}
+		os.Exit(1)
 	}
 
 	for _, dep := range project.Dependencies {
@@ -79,7 +84,9 @@ func (n *MVNLookup) PackagesNotInPublic() []string {
 // Returns true if the package exists in the public npm package repository.
 func (n *MVNLookup) isAvailableInPublic(pkg MVNPackage, retry int) bool {
 	if retry > 3 {
-		fmt.Printf(" [W] Maximum number of retries exhausted for package: %s\n", pkg.Group)
+		if n.Verbose {
+			fmt.Printf(" [W] Maximum number of retries exhausted for package: %s\n", pkg.Group)
+		}
 		return false
 	}
 	if pkg.Group == "" {
@@ -92,7 +99,9 @@ func (n *MVNLookup) isAvailableInPublic(pkg MVNPackage, retry int) bool {
 	}
 	resp, err := http.Get("https://repo1.maven.org/maven2/"+group+"/")
 	if err != nil {
-		fmt.Printf(" [W] Error when trying to request https://repo1.maven.org/maven2/"+group+"/ : %s\n", err)
+		if n.Verbose {
+			fmt.Printf(" [W] Error when trying to request https://repo1.maven.org/maven2/"+group+"/ : %s\n", err)
+		}
 		return false
 	}
 	defer resp.Body.Close()
@@ -111,7 +120,9 @@ func (n *MVNLookup) isAvailableInPublic(pkg MVNPackage, retry int) bool {
 		}
 		return true
 	} else if resp.StatusCode == 429 {
-		fmt.Printf(" [!] Server responded with 429 (Too many requests), throttling and retrying...\n")
+		if n.Verbose {
+			fmt.Printf(" [!] Server responded with 429 (Too many requests), throttling and retrying...\n")
+		}
 		time.Sleep(10 * time.Second)
 		retry = retry + 1
 		n.isAvailableInPublic(pkg, retry)
