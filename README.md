@@ -34,7 +34,7 @@ trusted party has claimed the scope name in the public repositories.
 - [Download](https://github.com/visma-prodsec/confused/releases/latest) a prebuilt binary from [releases page](https://github.com/visma-prodsec/confused/releases/latest), unpack and run!
 
   _or_
-- If you have recent go compiler installed: `go get -u github.com/visma-prodsec/confused` (the same command works for updating)
+- If you have recent go compiler installed: `go install github.com/visma-prodsec/confused@latest` (the same command works for updating)
 
   _or_
 - git clone https://github.com/visma-prodsec/confused ; cd confused ; go get ; go build
