@@ -21,7 +21,7 @@ func main() {
 	verbose := false
 	filename := ""
 	safespaces := ""
-	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"npm\", \"composer\", \"mvn\"")
+	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"pipenv\", \"npm\", \"composer\", \"mvn\"")
 	flag.StringVar(&safespaces, "s", "", "Comma-separated list of known-secure namespaces. Supports wildcards")
 	flag.BoolVar(&verbose, "v", false, "Verbose output")
 	flag.Parse()
@@ -34,8 +34,8 @@ func main() {
 	}
 
 	filename = flag.Args()[0]
-	if lang == "pip" {
-		resolver = NewPythonLookup(verbose)
+	if lang == "pip" || lang == "pipenv" {
+		resolver = NewPythonLookup(verbose, lang)
 	} else if lang == "npm" {
 		resolver = NewNPMLookup(verbose)
 	} else if lang == "composer" {

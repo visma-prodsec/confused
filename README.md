@@ -1,7 +1,7 @@
 # Confused
 
 A tool for checking for lingering free namespaces for private package names referenced in dependency configuration
-for Python (pypi) `requirements.txt`, JavaScript (npm) `package.json`, PHP (composer) `composer.json` or MVN (maven) `pom.xml`.
+for Python (pypi) `requirements.txt` and `Pipfile`, JavaScript (npm) `package.json`, PHP (composer) `composer.json` or MVN (maven) `pom.xml`.
 
 ## What is this all about?
 
@@ -46,7 +46,7 @@ Usage:
 
 Usage of ./confused:
   -l string
-        Package repository system. Possible values: "pip", "npm", "composer", "mvn" (default "npm")
+        Package repository system. Possible values: "pip", "pipenv", "npm", "composer", "mvn" (default "npm")
   -s string
         Comma-separated list of known-secure namespaces. Supports wildcards
   -v    Verbose output
@@ -58,6 +58,14 @@ Usage of ./confused:
 ### Python (PyPI)
 ```
 ./confused -l pip requirements.txt
+
+Issues found, the following packages are not available in public package repositories:
+ [!] internal_package1
+
+```
+
+```
+./confused -l pipenv Pipfile
 
 Issues found, the following packages are not available in public package repositories:
  [!] internal_package1
