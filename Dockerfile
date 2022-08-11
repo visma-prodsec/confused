@@ -1,4 +1,4 @@
 FROM golang:latest
 
-RUN go get -u github.com/visma-prodsec/confused
+RUN go install github.com/visma-prodsec/confused@latest
 ENTRYPOINT ["confused"]
