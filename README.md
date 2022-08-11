@@ -91,3 +91,17 @@ Issues found, the following packages are not available in public package reposit
  [!] internal/_package2
 
 ```
+
+## Docker version
+### Build container
+```
+docker build . -t confused
+cd /directory/to/test
+docker run --rm -v "$(pwd):/src" confused -l npm /src/package.json
+```
+
+### Scanning package.json and pom.xml in projects with multiple subdirectories
+```
+find . -name package.json -exec bash -c 'cd "$(dirname {})" && echo "testing {}" && docker run --rm -v "$(pwd):/src" confused -l npm /src/package.json' \;
+find . -name pom.xml -exec bash -c 'cd "$(dirname {})" && echo "testing {}" && docker run --rm -v "$(pwd):/src" confused -l mvn /src/pom.xml' \;
+```
