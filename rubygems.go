@@ -76,16 +76,14 @@ func (r *RubyGemsLookup) ReadPackagesFromFile(filename string) error {
 			} else {
 				version = ""
 			}
-			if len(parts) == 2 {
-				r.Packages = append(r.Packages, Gem{
-					Remote:       remote,
-					IsLocal:      !strings.HasPrefix(remote, "http"),
-					IsRubyGems:   remote == "https://rubygems.org",
-					IsTransitive: countLeadingSpaces(line) == 6,
-					Name:         name,
-					Version:      version,
-				})
-			}
+			r.Packages = append(r.Packages, Gem{
+				Remote:       remote,
+				IsLocal:      !strings.HasPrefix(remote, "http"),
+				IsRubyGems:   strings.HasPrefix(remote, "https://rubygems.org"),
+				IsTransitive: countLeadingSpaces(line) == 6,
+				Name:         name,
+				Version:      version,
+			})
 		} else {
 			continue
 		}
