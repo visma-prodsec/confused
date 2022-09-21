@@ -114,7 +114,7 @@ func (n *MVNLookup) isAvailableInPublic(pkg MVNPackage, retry int) bool {
 		fmt.Printf(" [!] Server responded with 429 (Too many requests), throttling and retrying...\n")
 		time.Sleep(10 * time.Second)
 		retry = retry + 1
-		n.isAvailableInPublic(pkg, retry)
+		return n.isAvailableInPublic(pkg, retry)
 	}
 	return false
 }

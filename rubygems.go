@@ -142,7 +142,7 @@ func (r *RubyGemsLookup) isAvailableInPublic(pkgname string, retry int) bool {
 		fmt.Printf(" [!] Server responded with 429 (Too many requests), throttling and retrying...\n")
 		time.Sleep(10 * time.Second)
 		retry = retry + 1
-		r.isAvailableInPublic(pkgname, retry)
+		return r.isAvailableInPublic(pkgname, retry)
 	}
 	return false
 }
