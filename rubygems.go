@@ -133,6 +133,8 @@ func (r *RubyGemsLookup) isAvailableInPublic(pkgname string, retry int) bool {
 		body, _ := ioutil.ReadAll(resp.Body)
 		err = json.Unmarshal(body, &rubygemsResp)
 		if err != nil {
+			// This shouldn't ever happen because if it doesn't return JSON, it likely has returned
+			// a non-200 status code.
 			fmt.Printf(" [W] Error when trying to unmarshal response from %s: %s\n", url, err)
 			return false
 		}
