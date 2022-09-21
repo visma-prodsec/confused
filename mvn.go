@@ -18,9 +18,9 @@ type MVNLookup struct {
 }
 
 type MVNPackage struct {
-	Group string
+	Group    string
 	Artifact string
-	Version string
+	Version  string
 }
 
 // NewNPMLookup constructs an `MVNLookup` struct and returns it.
@@ -68,7 +68,7 @@ func (n *MVNLookup) PackagesNotInPublic() []string {
 	notavail := []string{}
 	for _, pkg := range n.Packages {
 		if !n.isAvailableInPublic(pkg, 0) {
-			notavail = append(notavail, pkg.Group + "/" + pkg.Artifact)
+			notavail = append(notavail, pkg.Group+"/"+pkg.Artifact)
 		}
 	}
 	return notavail
@@ -86,11 +86,11 @@ func (n *MVNLookup) isAvailableInPublic(pkg MVNPackage, retry int) bool {
 		return true
 	}
 
-	group := strings.Replace(pkg.Group, ".", "/",-1)
+	group := strings.Replace(pkg.Group, ".", "/", -1)
 	if n.Verbose {
-		fmt.Print("Checking: https://repo1.maven.org/maven2/"+group+"/ ")
+		fmt.Print("Checking: https://repo1.maven.org/maven2/" + group + "/ ")
 	}
-	resp, err := http.Get("https://repo1.maven.org/maven2/"+group+"/")
+	resp, err := http.Get("https://repo1.maven.org/maven2/" + group + "/")
 	if err != nil {
 		fmt.Printf(" [W] Error when trying to request https://repo1.maven.org/maven2/"+group+"/ : %s\n", err)
 		return false
