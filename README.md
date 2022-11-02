@@ -42,11 +42,11 @@ trusted party has claimed the scope name in the public repositories.
 ## Usage
 ```
 Usage:
- ./confused [-l LANGUAGENAME] depfilename.ext
+ confused [-l LANGUAGENAME] depfilename.ext
 
-Usage of ./confused:
+Usage of confused:
   -l string
-        Package repository system. Possible values: "pip", "npm", "composer", "mvn" (default "npm")
+        Package repository system. Possible values: "pip", "npm", "composer", "mvn", "rubygems" (default "npm")
   -s string
         Comma-separated list of known-secure namespaces. Supports wildcards
   -v    Verbose output
@@ -80,7 +80,6 @@ Issues found, the following packages are not available in public package reposit
  [!] internal_package1
 ```
 
-
 ### Maven (mvn)
 ```
 ./confused -l mvn pom.xml
@@ -90,4 +89,15 @@ Issues found, the following packages are not available in public package reposit
  [!] internal/package1
  [!] internal/_package2
 
+```
+
+### Ruby (rubygems)
+```
+./confused -l rubygems Gemfile.lock
+
+Issues found, the following packages are not available in public package repositories:
+ [!] internal
+ [!] internal/package1
+ [!] internal/_package2
+ 
 ```
