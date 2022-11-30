@@ -1,7 +1,7 @@
 # Confused
 
 A tool for checking for lingering free namespaces for private package names referenced in dependency configuration
-for Python (pypi) `requirements.txt`, JavaScript (npm) `package.json`, PHP (composer) `composer.json` or MVN (maven) `pom.xml`.
+for Python (pypi) `requirements.txt`, JavaScript (npm) `package.json`, PHP (composer) `composer.json`, MVN (maven) `pom.xml` or Ruby (RubyGems) `Gemfile`.
 
 ## What is this all about?
 
