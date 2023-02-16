@@ -101,6 +101,7 @@ func (n *NPMLookup) ReadPackagesFromFile(filename string) error {
 // Returns a slice of strings with any npm packages not in the public npm package repository
 func (n *NPMLookup) PackagesNotInPublic() []string {
 	notavail := []string{}
+	avail := readMap("/tmp/confused-npm-avail")
 	for _, pkg := range n.Packages {
 		if n.localReference(pkg.Version) || n.urlReference(pkg.Version) || n.gitReference(pkg.Version) {
 			continue
@@ -113,10 +114,13 @@ func (n *NPMLookup) PackagesNotInPublic() []string {
 				continue
 			}
 		}
-		if !n.isAvailableInPublic(pkg.Name, 0) {
+		if !avail[pkg.Name] && !n.isAvailableInPublic(pkg.Name, 0) {
 			notavail = append(notavail, pkg.Name)
+		} else {
+			avail[pkg.Name] = true
 		}
 	}
+	writeMap(avail, "/tmp/confused-npm-avail")
 	return notavail
 }
 
