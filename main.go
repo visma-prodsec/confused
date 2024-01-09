@@ -21,7 +21,7 @@ func main() {
 	verbose := false
 	filename := ""
 	safespaces := ""
-	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"npm\", \"composer\", \"mvn\", \"rubygems\"")
+	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"npm\", \"composer\", \"composer-installed\", \"mvn\", \"rubygems\"")
 	flag.StringVar(&safespaces, "s", "", "Comma-separated list of known-secure namespaces. Supports wildcards")
 	flag.BoolVar(&verbose, "v", false, "Verbose output")
 	flag.Parse()
@@ -46,6 +46,8 @@ func main() {
 		resolver = NewMVNLookup(verbose)
 	case "rubygems":
 		resolver = NewRubyGemsLookup(verbose)
+	case "composer-installed":
+		resolver = NewComposerInstalledLookup(verbose)
 	default:
 		fmt.Printf("Unknown package repository system: %s\n", lang)
 		os.Exit(1)
