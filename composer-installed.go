@@ -8,40 +8,47 @@ import (
 	"strings"
 )
 
-type ComposerJSON struct {
+type ComposerInstalledJSON []struct {
+	Name string `json:"name"`
 	Require map[string]string `json:"require"`
 	RequireDev map[string]string `json:"require-dev"`
 }
 
-type ComposerLookup struct {
+type ComposerInstalledLookup struct {
 	Packages []string
 	Verbose bool
 }
 
-func NewComposerLookup(verbose bool) PackageResolver {
-	return &ComposerLookup{Packages: []string{}, Verbose: verbose}
+func NewComposerInstalledLookup(verbose bool) PackageResolver {
+	return &ComposerInstalledLookup{Packages: []string{}, Verbose: verbose}
 }
 
-func (c *ComposerLookup) ReadPackagesFromFile(rawfile []byte) error {
+func (c *ComposerInstalledLookup) ReadPackagesFromFile(rawfile []byte) error {
 
-	data := ComposerJSON{}
+	data := ComposerInstalledJSON{}
 	err := json.Unmarshal([]byte(rawfile), &data)
 	if err != nil {
 		return err
 	}
 
-	for pkgname := range data.Require {
-		c.Packages = append(c.Packages, pkgname)
-	}
+	for i := 0; i < len(data); i++ {
 
-	for pkgname := range data.RequireDev {
-		c.Packages = append(c.Packages, pkgname)
+		c.Packages = append(c.Packages, data[i].Name)
+
+		for pkgname := range data[i].Require {
+			c.Packages = append(c.Packages, pkgname)
+		}
+
+		for pkgname := range data[i].RequireDev {
+			c.Packages = append(c.Packages, pkgname)
+		}
+
 	}
 
 	return nil
 }
 
-func (c *ComposerLookup) PackagesNotInPublic() []string {
+func (c *ComposerInstalledLookup) PackagesNotInPublic() []string {
 	notavail := []string{}
 	for _, pkg := range c.Packages {
 		if pkg == "php" {
@@ -56,7 +63,7 @@ func (c *ComposerLookup) PackagesNotInPublic() []string {
 	return notavail
 }
 
-func (c *ComposerLookup) isAvailableInPublic(pkgname string, retry int) bool {
+func (c *ComposerInstalledLookup) isAvailableInPublic(pkgname string, retry int) bool {
 	if retry > 3 {
 		fmt.Printf(" [W] Maximum number of retries exhausted for package %s\n", pkgname)
 

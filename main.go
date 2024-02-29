@@ -13,31 +13,33 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"io/ioutil"
+	"net/http"
 )
 
 func main() {
 	var resolver PackageResolver
 	lang := ""
 	verbose := false
-	filename := ""
+	local_file := ""
+	url_file := ""
 	safespaces := ""
-	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"npm\", \"composer\", \"mvn\", \"rubygems\"")
+	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"pipenv\" \"npm\", \"composer\", \"composer-installed\", \"mvn\", \"rubygems\"")
 	flag.StringVar(&safespaces, "s", "", "Comma-separated list of known-secure namespaces. Supports wildcards")
+	flag.StringVar(&local_file, "f", "", "Local input file")
+	flag.StringVar(&url_file, "u", "", "URL input file")
 	flag.BoolVar(&verbose, "v", false, "Verbose output")
 	flag.Parse()
 
-	// Check that we have a filename
-	if flag.NArg() == 0 {
+	if (url_file == "" && local_file == "") || (url_file != "" && local_file != "") {
 		Help()
 		flag.Usage()
 		os.Exit(1)
 	}
 
-	filename = flag.Args()[0]
-
 	switch lang {
-	case "pip":
-		resolver = NewPythonLookup(verbose)
+	case "pip" || lang == "pipenv" :
+		resolver = NewPythonLookup(verbose, lang)
 	case "npm":
 		resolver = NewNPMLookup(verbose)
 	case "composer":
@@ -46,12 +48,36 @@ func main() {
 		resolver = NewMVNLookup(verbose)
 	case "rubygems":
 		resolver = NewRubyGemsLookup(verbose)
+	case "composer-installed":
+		resolver = NewComposerInstalledLookup(verbose)
 	default:
 		fmt.Printf("Unknown package repository system: %s\n", lang)
 		os.Exit(1)
 	}
 
-	err := resolver.ReadPackagesFromFile(filename)
+	var rawfile []byte
+	var err error
+	if local_file != "" {
+		rawfile, err = ioutil.ReadFile(local_file)
+		if err != nil {
+			fmt.Printf("Encountered an error while trying to read packages from file: %s\n", err)
+			os.Exit(1)
+		}
+	}
+	
+	if url_file != "" {
+		resp, err := http.Get(url_file)
+		if err != nil {
+			fmt.Printf(" [W] Error when trying to request %s: %s\n", url_file, err)
+			os.Exit(1)
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode == http.StatusOK {
+			rawfile, err = ioutil.ReadAll(resp.Body)
+		}
+	}
+
+	err = resolver.ReadPackagesFromFile(rawfile)
 	if err != nil {
 		fmt.Printf("Encountered an error while trying to read packages from file: %s\n", err)
 		os.Exit(1)

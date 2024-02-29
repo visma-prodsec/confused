@@ -65,15 +65,12 @@ func NewNPMLookup(verbose bool) PackageResolver {
 // ReadPackagesFromFile reads package information from an npm package.json file
 //
 // Returns any errors encountered
-func (n *NPMLookup) ReadPackagesFromFile(filename string) error {
-	rawfile, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return err
-	}
+func (n *NPMLookup) ReadPackagesFromFile(rawfile []byte) error {
+
 	data := PackageJSON{}
-	err = json.Unmarshal([]byte(rawfile), &data)
+	err := json.Unmarshal([]byte(rawfile), &data)
 	if err != nil {
-		fmt.Printf(" [W] Non-fatal issue encountered while reading %s : %s\n", filename, err)
+		fmt.Printf(" [W] Non-fatal issue encountered while parsing npm file: %s\n", err)
 	}
 	for pkgname, pkgversion := range data.Dependencies {
 		n.Packages = append(n.Packages, NPMPackage{pkgname, pkgversion})
