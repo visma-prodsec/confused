@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	// "io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -21,11 +21,8 @@ func NewPythonLookup(verbose bool) PackageResolver {
 // ReadPackagesFromFile reads package information from a python `requirements.txt` file
 //
 // Returns any errors encountered
-func (p *PythonLookup) ReadPackagesFromFile(filename string) error {
-	rawfile, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return err
-	}
+func (p *PythonLookup) ReadPackagesFromFile(rawfile []byte) error {
+
 	line := ""
 	for _, l := range strings.Split(string(rawfile), "\n") {
 		l = strings.TrimSpace(l)

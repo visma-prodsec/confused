@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"time"
+	"strings"
 )
 
 type ComposerJSON struct {
@@ -22,14 +22,10 @@ func NewComposerLookup(verbose bool) PackageResolver {
 	return &ComposerLookup{Packages: []string{}, Verbose: verbose}
 }
 
-func (c *ComposerLookup) ReadPackagesFromFile(filename string) error {
-	rawfile, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return err
-	}
+func (c *ComposerLookup) ReadPackagesFromFile(rawfile []byte) error {
 
 	data := ComposerJSON{}
-	err = json.Unmarshal([]byte(rawfile), &data)
+	err := json.Unmarshal([]byte(rawfile), &data)
 	if err != nil {
 		return err
 	}
@@ -65,6 +61,11 @@ func (c *ComposerLookup) isAvailableInPublic(pkgname string, retry int) bool {
 		fmt.Printf(" [W] Maximum number of retries exhausted for package %s\n", pkgname)
 
 		return false
+	}
+
+	// check if the package is specifically a platform package https://getcomposer.org/doc/01-basic-usage.md#platform-packages
+	if (strings.HasPrefix(pkgname, "ext-")) {
+		return true
 	}
 
 	if c.Verbose {
