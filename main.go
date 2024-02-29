@@ -24,7 +24,7 @@ func main() {
 	local_file := ""
 	url_file := ""
 	safespaces := ""
-	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"npm\", \"composer\", \"composer-installed\", \"mvn\", \"rubygems\"")
+	flag.StringVar(&lang, "l", "npm", "Package repository system. Possible values: \"pip\", \"pipenv\" \"npm\", \"composer\", \"composer-installed\", \"mvn\", \"rubygems\"")
 	flag.StringVar(&safespaces, "s", "", "Comma-separated list of known-secure namespaces. Supports wildcards")
 	flag.StringVar(&local_file, "f", "", "Local input file")
 	flag.StringVar(&url_file, "u", "", "URL input file")
@@ -38,8 +38,8 @@ func main() {
 	}
 
 	switch lang {
-	case "pip":
-		resolver = NewPythonLookup(verbose)
+	case "pip" || lang == "pipenv" :
+		resolver = NewPythonLookup(verbose, lang)
 	case "npm":
 		resolver = NewNPMLookup(verbose)
 	case "composer":

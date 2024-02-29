@@ -2,27 +2,46 @@ package main
 
 import (
 	"fmt"
-	// "io/ioutil"
+	"github.com/pelletier/go-toml"
+	"io/ioutil"
 	"net/http"
 	"strings"
 )
 
 // PythonLookup represents a collection of python packages to be tested for dependency confusion.
 type PythonLookup struct {
-	Packages []string
-	Verbose  bool
+	Packages       []string
+	Verbose        bool
+	PackageManager string
 }
 
 // NewPythonLookup constructs a `PythonLookup` struct and returns it
-func NewPythonLookup(verbose bool) PackageResolver {
-	return &PythonLookup{Packages: []string{}, Verbose: verbose}
+func NewPythonLookup(verbose bool, packageManager string) PackageResolver {
+	return &PythonLookup{Packages: []string{}, Verbose: verbose, PackageManager: packageManager}
 }
 
-// ReadPackagesFromFile reads package information from a python `requirements.txt` file
+// ReadPackagesFromFile chooses a file parser based on the user-supplied python package manager.
 //
 // Returns any errors encountered
-func (p *PythonLookup) ReadPackagesFromFile(rawfile []byte) error {
+func (p *PythonLookup) ReadPackagesFromFile(filename string) error {
+	switch p.PackageManager {
+	case "pip":
+		return p.ReadPackagesFromRequirementsTxt(filename)
+	case "pipenv":
+		return p.ReadPackagesFromPipfile(filename)
+	default:
+		return fmt.Errorf("Python package manager not implemented: %s", p.PackageManager)
+	}
+}
 
+// ReadPackagesFromRequirementsTxt reads package information from a python `requirements.txt`.
+//
+// Returns any errors encountered
+func (p *PythonLookup) ReadPackagesFromRequirementsTxt(filename string) error {
+	rawfile, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return err
+	}
 	line := ""
 	for _, l := range strings.Split(string(rawfile), "\n") {
 		l = strings.TrimSpace(l)
@@ -43,6 +62,29 @@ func (p *PythonLookup) ReadPackagesFromFile(rawfile []byte) error {
 			// reset the line variable
 			line = ""
 		}
+	}
+	return nil
+}
+
+// ReadPackagesFromPipfile reads package information from a python `Pipfile`.
+//
+// Returns any errors encountered
+func (p *PythonLookup) ReadPackagesFromPipfile(filename string) error {
+	rawfile, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	config, err := toml.Load(string(rawfile))
+	if err != nil {
+		return err
+	}
+	packages := config.Get("packages")
+	if packages != nil {
+		p.Packages = append(p.Packages, packages.(*toml.Tree).Keys()...)
+	}
+	dev_packages := config.Get("dev-packages")
+	if dev_packages != nil {
+		p.Packages = append(p.Packages, dev_packages.(*toml.Tree).Keys()...)
 	}
 	return nil
 }
@@ -70,6 +112,7 @@ func (p *PythonLookup) pipSplit(r rune) bool {
 		'~',
 		'#',
 		'[',
+		';',
 	}
 	return inSlice(r, delims)
 }

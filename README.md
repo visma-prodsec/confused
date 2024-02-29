@@ -39,6 +39,13 @@ trusted party has claimed the scope name in the public repositories.
   _or_
 - git clone https://github.com/knavesec/confused ; cd confused ; go get ; go build
 
+### Docker Build container
+```
+docker build . -t confused
+cd /directory/to/test
+docker run --rm -v "$(pwd):/src" confused -l npm /src/package.json
+```
+
 ## Usage
 ```
 Usage of confused:
@@ -56,10 +63,15 @@ Usage of confused:
 
 ## Example
 
-### Python (PyPI)
+### Python (pip, pipenv)
 ```
 ./confused -l pip -f requirements.txt
 
+Issues found, the following packages are not available in public package repositories:
+ [!] internal_package1
+
+
+./confused -l pipenv -f Pipfile
 Issues found, the following packages are not available in public package repositories:
  [!] internal_package1
 
@@ -120,3 +132,8 @@ Issues found, the following packages are not available in public package reposit
  [!] internal/package1
  [!] internal/_package2
 ```
+
+## TODO
+
+- Ruby `Gemfile`
+- Ruby `gemspec`
