@@ -15,6 +15,7 @@ import (
 	"strings"
 	"io/ioutil"
 	"net/http"
+	"crypto/tls"
 )
 
 func main() {
@@ -68,7 +69,10 @@ func main() {
 	}
 	
 	if url_file != "" {
-		client := &http.Client{}
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client := &http.Client{Transport: tr}
 
         req, err := http.NewRequest("GET", url_file, nil)
         if err != nil {

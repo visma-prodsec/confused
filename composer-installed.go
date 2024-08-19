@@ -35,18 +35,18 @@ func (c *ComposerInstalledLookup) ReadPackagesFromFile(rawfile []byte) error {
 	err := json.Unmarshal([]byte(rawfile), &data)
 	if err != nil {
 		fmt.Printf("Error reading file as Vendor file\n")
+		vendorflag = false
 		// return err
 	}
 
-	vendorflag = false
-
 	data2 := ComposerInstalledJSONPkg{}
-	err2 := json.Unmarshal([]byte(rawfile), &data2)
-	if err2 != nil {
-		fmt.Printf("Error reading file as generic Composer file\n")
-		return err2
+	if !(vendorflag) {
+		err2 := json.Unmarshal([]byte(rawfile), &data2)
+		if err2 != nil {
+			fmt.Printf("Error reading file as generic Composer file\n")
+			return err2
+		}
 	}
-
 
 	d := ComposerInstalledJSON{}
 
