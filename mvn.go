@@ -31,13 +31,7 @@ func NewMVNLookup(verbose bool) PackageResolver {
 // ReadPackagesFromFile reads package information from an npm package.json file
 //
 // Returns any errors encountered
-func (n *MVNLookup) ReadPackagesFromFile(filename string) error {
-	rawfile, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return err
-	}
-
-	fmt.Print("Checking: filename: " + filename + "\n")
+func (n *MVNLookup) ReadPackagesFromFile(rawfile []byte) error {
 
 	var project MavenProject
 	if err := xml.Unmarshal([]byte(rawfile), &project); err != nil {

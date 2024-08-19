@@ -1,7 +1,7 @@
 # Confused
 
 A tool for checking for lingering free namespaces for private package names referenced in dependency configuration
-for Python (pypi) `requirements.txt`, JavaScript (npm) `package.json`, PHP (composer) `composer.json` or MVN (maven) `pom.xml`.
+for Python (pypi) `requirements.txt`, JavaScript (npm) `package.json`, PHP (composer) `composer.json`, Ruby (rubygem) `Gemfile.lock` or MVN (maven) `pom.xml`.
 
 ## What is this all about?
 
@@ -31,34 +31,47 @@ trusted party has claimed the scope name in the public repositories.
 
 ## Installation
 
-- [Download](https://github.com/visma-prodsec/confused/releases/latest) a prebuilt binary from [releases page](https://github.com/visma-prodsec/confused/releases/latest), unpack and run!
+- [Download](https://github.com/knavesec/confused/releases/latest) a prebuilt binary from [releases page](https://github.com/knavesec/confused/releases/latest), unpack and run!
 
   _or_
-- If you have recent go compiler installed: `go get -u github.com/visma-prodsec/confused` (the same command works for updating)
+- If you have recent go compiler installed: `go get -u github.com/knavesec/confused` (the same command works for updating)
 
   _or_
-- git clone https://github.com/visma-prodsec/confused ; cd confused ; go get ; go build
+- git clone https://github.com/knavesec/confused ; cd confused ; go get ; go build
+
+### Docker Build container
+```
+docker build . -t confused
+cd /directory/to/test
+docker run --rm -v "$(pwd):/src" confused -l npm /src/package.json
+```
 
 ## Usage
 ```
-Usage:
- confused [-l LANGUAGENAME] depfilename.ext
-
 Usage of confused:
+  -f string
+    	Local input file
   -l string
-        Package repository system. Possible values: "pip", "npm", "composer", "mvn", "rubygems" (default "npm")
+    	Package repository system. Possible values: "pip", "npm", "composer", "composer-installed", "mvn", "rubygems" (default "npm")
   -s string
-        Comma-separated list of known-secure namespaces. Supports wildcards
-  -v    Verbose output
+    	Comma-separated list of known-secure namespaces. Supports wildcards
+  -u string
+    	URL input file
+  -v	Verbose output
 
 ```
 
 ## Example
 
-### Python (PyPI)
+### Python (pip, pipenv)
 ```
-./confused -l pip requirements.txt
+./confused -l pip -f requirements.txt
 
+Issues found, the following packages are not available in public package repositories:
+ [!] internal_package1
+
+
+./confused -l pipenv -f Pipfile
 Issues found, the following packages are not available in public package repositories:
  [!] internal_package1
 
@@ -66,7 +79,7 @@ Issues found, the following packages are not available in public package reposit
 
 ### JavaScript (npm)
 ```
-./confused -l npm package.json
+./confused -l npm -f package.json
 
 Issues found, the following packages are not available in public package repositories:
  [!] internal_package1
@@ -82,7 +95,7 @@ Issues found, the following packages are not available in public package reposit
 
 ### Maven (mvn)
 ```
-./confused -l mvn pom.xml
+./confused -l mvn -f pom.xml
 
 Issues found, the following packages are not available in public package repositories:
  [!] internal
@@ -93,7 +106,7 @@ Issues found, the following packages are not available in public package reposit
 
 ### Ruby (rubygems)
 ```
-./confused -l rubygems Gemfile.lock
+./confused -l rubygems -f Gemfile.lock
 
 Issues found, the following packages are not available in public package repositories:
  [!] internal
@@ -101,3 +114,26 @@ Issues found, the following packages are not available in public package reposit
  [!] internal/_package2
  
 ```
+
+### Composer (composer, composer-installed)
+```
+./confused -l composer -f composer.json
+
+Issues found, the following packages are not available in public package repositories:
+ [!] internal
+ [!] internal/package1
+ [!] internal/_package2
+ 
+
+./confused -l composer-installed -f installed.json
+
+Issues found, the following packages are not available in public package repositories:
+ [!] internal
+ [!] internal/package1
+ [!] internal/_package2
+```
+
+## TODO
+
+- Ruby `Gemfile`
+- Ruby `gemspec`

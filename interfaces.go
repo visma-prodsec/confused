@@ -6,6 +6,6 @@ package main
 //
 // PackagesNotInPublic should determine whether or not a package is not available in a public package repository and return a slice of all packages not available in a public package repository.
 type PackageResolver interface {
-	ReadPackagesFromFile(string) error
+	ReadPackagesFromFile([]byte) error
 	PackagesNotInPublic() []string
 }

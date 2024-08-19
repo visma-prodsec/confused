@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 )
@@ -40,13 +39,9 @@ func NewRubyGemsLookup(verbose bool) PackageResolver {
 // ReadPackagesFromFile reads package information from a Gemfile.lock file
 //
 // Returns any errors encountered
-func (r *RubyGemsLookup) ReadPackagesFromFile(filename string) error {
-	file, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
+func (r *RubyGemsLookup) ReadPackagesFromFile(rawfile []byte) error {
+
+	scanner := bufio.NewScanner(strings.NewReader(string(rawfile)))
 	var remote string
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -79,6 +74,7 @@ func (r *RubyGemsLookup) ReadPackagesFromFile(filename string) error {
 			r.Packages = append(r.Packages, Gem{
 				Remote:       remote,
 				IsLocal:      !strings.HasPrefix(remote, "http"),
+				// what is this logic? only caring if it's on ruby gems? what about other URLs? https://github.com/omnilaboratory/api.doc/blob/40f21ef6765ec5d7d9029446109141669a71a57d/Gemfile.lock
 				IsRubyGems:   strings.HasPrefix(remote, "https://rubygems.org"),
 				IsTransitive: countLeadingSpaces(line) == 6,
 				Name:         name,
@@ -115,6 +111,7 @@ func (r *RubyGemsLookup) isAvailableInPublic(pkgname string, retry int) bool {
 		fmt.Printf(" [W] Maximum number of retries exhausted for package: %s\n", pkgname)
 		return false
 	}
+
 	url := fmt.Sprintf("https://rubygems.org/api/v1/gems/%s.json", pkgname)
 	if r.Verbose {
 		fmt.Printf("Checking: %s : \n", url)
